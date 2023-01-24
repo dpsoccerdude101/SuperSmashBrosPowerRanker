@@ -8,7 +8,7 @@ export function links() {
 }
 
 export const meta: MetaFunction = () => {
-  const description = 'An Application to view the Power Ranking of any Super Smash Bros Tournament';
+  const description = 'An Application to view the Power Ranking of any Super Smash Bros Tournament Series';
   return {
     charset: 'utf-8',
     description,
