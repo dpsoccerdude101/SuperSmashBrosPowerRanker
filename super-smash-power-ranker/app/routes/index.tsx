@@ -2,8 +2,8 @@ import type { LinksFunction, MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
 
 export const meta: MetaFunction = () => ({
-  title: "Remix: So great, it's funny!",
-  description: 'Remix jokes app. Learn Remix and laugh at the same time!',
+  title: 'Super Smash Bros Power Ranking',
+  description: 'An Application to view the Power Ranking of any Super Smash Bros Tournament Series',
 });
 
 const IndexRoute = () => (
