@@ -13,10 +13,10 @@ export const meta: MetaFunction = () => {
     charset: 'utf-8',
     description,
     keywords: 'Remix,jokes',
-    'twitter:image': 'https://remix-jokes.lol/social.png',
+    'twitter:image':
+      'https://www.bing.com/th?pid=Sgg&qlt=100&u=https%3A%2F%2Fimages.start.gg%2Fimages%2Ftournament%2F505027%2Fimage-248f55e4772880196db9f1bbd51ef73a-optimized.png&ehk=cuAd2kX7aZwCQ56QlBE9Sod%2BekP7XdR%2Fz8KumwAggLw%3D&w=280&h=280&r=0',
     'twitter:card': 'summary_large_image',
-    'twitter:creator': '@remix_run',
-    'twitter:site': '@remix_run',
+    'twitter:creator': '@dennis_pavlyuk',
     'twitter:title': 'Super Smash Bros Power Ranker',
     'twitter:description': description,
   };
