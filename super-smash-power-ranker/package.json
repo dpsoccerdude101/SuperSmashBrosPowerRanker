@@ -9,6 +9,17 @@
     "start": "cross-env NODE_ENV=production netlify dev",
     "typecheck": "tsc"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "printWidth": 120,
+    "singleAttributePerLine": true
+  },
   "dependencies": {
     "@lilib/hooks": "^1.0.1",
     "@netlify/functions": "^1.3.0",

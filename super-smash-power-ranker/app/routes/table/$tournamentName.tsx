@@ -9,7 +9,23 @@ import toPowerRankingTable from '~/common/adapters/toPowerRankingTable';
 import type { EventModel } from '~/common/types/EventModel';
 import { client } from '~/lib/graphql-client';
 
-const getTournament = (tournamentName = 'def-s-dojo-winter-chronicle-2023') => gql`
+const getTournamentEntrants = (tournamentName = 'def-s-dojo-winter-chronicle-2023') => gql`
+  query {
+    tournament(slug: "${tournamentName}") {
+      id
+      name
+      events {
+        ##id
+        ##name
+        ##competitionTier
+        numEntrants
+        ##slug
+      }
+    }
+  }
+`;
+
+const getTournament = (maxQueryLength: number, tournamentName = 'def-s-dojo-winter-chronicle-2023') => gql`
   {
     tournament(slug: "${tournamentName}") {
       id
@@ -20,7 +36,7 @@ const getTournament = (tournamentName = 'def-s-dojo-winter-chronicle-2023') => g
         ##competitionTier
         numEntrants
         ##slug
-        standings(query: { page: 1, perPage: 100 }) {
+        standings(query: { page: 1, perPage: ${maxQueryLength} }) {
           nodes {
             placement
             entrant {
@@ -42,9 +58,27 @@ const getTournament = (tournamentName = 'def-s-dojo-winter-chronicle-2023') => g
   }
 `;
 
+const getMaxQueryLength = (numOfStandings: number) =>
+  Math.floor(Math.exp(4.73395278) * Math.exp(-0.00138475911 * numOfStandings));
+
 export const loader = async ({ params, request }: LoaderArgs) => {
+  const getNumStandings = async () => {
+    const response = await client.request(getTournamentEntrants(params.tournamentName ?? ''));
+    const { tournament } = JSON.parse(JSON.stringify(response));
+    const nonEmptyEvents: EventModel[] = tournament.events.filter((item: EventModel) => item.numEntrants !== 0);
+    return nonEmptyEvents.reduce((acc, curr) => acc + curr.numEntrants, 0);
+  };
+
   try {
-    const response = await client.request(getTournament(params.tournamentName ?? ''));
+    const numOfStandings = await getNumStandings();
+    if (numOfStandings > 3400) {
+      throw new Response('The number of standings for this tournament is too great to render a power ranking table', {
+        status: 503,
+      });
+    }
+    const maxQueryLength = getMaxQueryLength(numOfStandings);
+    console.log(maxQueryLength);
+    const response = await client.request(getTournament(maxQueryLength, params.tournamentName));
     const { tournament } = JSON.parse(JSON.stringify(response));
     const nonEmptyEvents = tournament.events.filter((item: EventModel) => item.numEntrants !== 0);
     const vm = toPowerRankingTable(nonEmptyEvents);
@@ -64,11 +98,12 @@ export const ErrorBoundary = () => {
 };
 
 export const CatchBoundary = () => {
-  const { status } = useCatch();
+  const { status, statusText } = useCatch();
   const params = useParams();
   if (status === 400) return <div className="error-container">What you're trying to do is not allowed.</div>;
   if (status === 403) return <div className="error-container">Sorry, but {params.jokeId} is not your joke.</div>;
   if (status === 404) return <div className="error-container">Huh? What the heck is "{params.tournamentName}"?</div>;
+  if (status === 503) return <div className="error-container">{statusText}"?</div>;
   throw new Error(`Unhandled error: ${status}`);
 };
 
