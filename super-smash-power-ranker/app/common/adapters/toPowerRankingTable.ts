@@ -11,7 +11,6 @@ type PlayerVMDTO = {
 
 type PlayerWithPowerRankingVMDTO = PlayerVMDTO & {
   powerRanking: number;
-  position: number;
 };
 
 const UniquePlayersAdapter = (players: PlayerVMDTO[]) => [...new Map(players.map((item) => [item.id, item])).values()];
@@ -29,10 +28,10 @@ const getAllPlayers = (events: EventModel[]) => {
 };
 
 const toPlayerPowerRankingModel =
-  (player: PlayerVMDTO, position: number) =>
+  (player: PlayerVMDTO) =>
   (events: EventModel[]): PlayerWithPowerRankingVMDTO => {
     const powerRanking = PlayerPowerRankingAdapter(events, player.id);
-    return { ...player, powerRanking: Number(powerRanking.toFixed(2)), position };
+    return { ...player, powerRanking: Number(powerRanking.toFixed(2)) };
   };
 
 const sortPlayerByPowerRanking = (players: PlayerWithPowerRankingVMDTO[]) => {
@@ -46,8 +45,8 @@ const sortPlayerByPowerRanking = (players: PlayerWithPowerRankingVMDTO[]) => {
 
 const toPowerRankingTable = (events: EventModel[]) => {
   const players = getAllPlayers(events);
-  const playersWithPowerRankings = players.map((player, index) => toPlayerPowerRankingModel(player, index + 1)(events));
-  return sortPlayerByPowerRanking(playersWithPowerRankings);
+  const playersWithPowerRankings = players.map((player) => toPlayerPowerRankingModel(player)(events));
+  return sortPlayerByPowerRanking(playersWithPowerRankings).map((item, index) => ({ ...item, position: index + 1 }));
 };
 
 export default toPowerRankingTable;
